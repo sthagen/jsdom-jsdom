@@ -5,7 +5,7 @@ const jsYAML = require("js-yaml");
 const { Minimatch } = require("minimatch");
 const { describe, specify, before, after } = require("mocha-sugar-free");
 const { readManifest, getPossibleTestFilePaths } = require("./wpt-manifest-utils.js");
-const startWPTServer = require("./start-wpt-server.js");
+const wptServer = require("./wpt-server.js");
 const { resolveReason } = require("./utils.js");
 
 const validInnerReasons = new Set([
@@ -19,7 +19,10 @@ const validReasons = new Set([
   "fail-with-canvas",
   "timeout",
   "flaky",
-  "needs-canvas"
+  "needs-canvas",
+  // Node 18 has a bug in its vm module that causes certain property redefinition tests to fail.
+  // They start passing again on Node 19.
+  "fail-node18"
 ]);
 
 const manifestFilename = path.resolve(__dirname, "wpt-manifest.json");
@@ -36,14 +39,14 @@ checkToRun();
 
 let wptServerURL, serverProcess;
 const runSingleWPT = require("./run-single-wpt.js")(() => wptServerURL);
-before({ timeout: 30 * 1000 }, async () => {
-  const { urls, subprocess } = await startWPTServer({ toUpstream: false });
+before({ timeout: 30_000 }, async () => {
+  const { urls, subprocess } = await wptServer.start({ toUpstream: false });
   wptServerURL = urls[0];
   serverProcess = subprocess;
 });
 
 after(() => {
-  serverProcess.kill("SIGINT");
+  wptServer.kill(serverProcess);
 });
 
 describe("web-platform-tests", () => {

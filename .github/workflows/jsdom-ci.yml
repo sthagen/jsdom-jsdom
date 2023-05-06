@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   lint:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -33,7 +33,7 @@ jobs:
   build-with-canvas:
     env:
       TEST_SUITE: 'node-canvas'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -50,31 +50,12 @@ jobs:
         run: yarn --frozen-lockfile
       - name: Run tests
         run: yarn add canvas && yarn test --retries 1
-  build-with-browser:
-    env:
-      TEST_SUITE: 'browser'
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: 'recursive'
-      - name: Run web browser tests
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      - name: Setup HOSTS file for Web Platform Test server
-        run: ./test/web-platform-tests/tests/wpt make-hosts-file | sudo tee -a /etc/hosts
-      - name: Install dependencies
-        run: yarn --frozen-lockfile
-      - name: Run tests
-        run: yarn test-browser
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         node-version:
-          - 14
           - 16
           - 18
         architecture:

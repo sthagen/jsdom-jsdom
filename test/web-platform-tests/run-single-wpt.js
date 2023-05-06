@@ -3,7 +3,6 @@
 const path = require("path");
 const { URL } = require("url");
 const { specify } = require("mocha-sugar-free");
-const { inBrowserContext } = require("../util.js");
 const { JSDOM, VirtualConsole } = require("../../lib/api.js");
 const ResourceLoader = require("../../lib/jsdom/browser/resources/resource-loader");
 const { resolveReason } = require("./utils.js");
@@ -17,20 +16,13 @@ const unexpectedPassingTestMessage = `
             `;
 
 module.exports = urlPrefixFactory => {
-  if (inBrowserContext()) {
-    return () => {
-      // TODO: browser support for running WPT
-    };
-  }
-
   return (testPath, title = testPath, expectFail = false) => {
     specify({
       title,
       expectPromise: true,
       // WPT also takes care of timeouts (maximum 60 seconds), this is an extra failsafe:
-      timeout: 70000,
-      slow: 10000,
-      skipIfBrowser: true,
+      timeout: 70_000,
+      slow: 10_000,
       fn() {
         return createJSDOM(urlPrefixFactory(), testPath, expectFail);
       }
