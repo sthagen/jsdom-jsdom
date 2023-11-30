@@ -1,6 +1,6 @@
 {
   "name": "jsdom",
-  "version": "23.0.0",
+  "version": "23.0.1",
   "description": "A JavaScript implementation of many web standards",
   "keywords": [
     "dom",
@@ -43,7 +43,7 @@
     "xml-name-validator": "^5.0.0"
   },
   "peerDependencies": {
-    "canvas": "^3.0.0"
+    "canvas": "^2.11.2"
   },
   "peerDependenciesMeta": {
     "canvas": {
