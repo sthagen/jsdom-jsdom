@@ -4,18 +4,18 @@
 interface HTMLTextAreaElement : HTMLElement {
   [CEReactions, Reflect] attribute DOMString autocomplete;
   [CEReactions, Reflect] attribute boolean autofocus;
-  [CEReactions] attribute unsigned long cols;
+  [CEReactions, ReflectPositiveWithFallback, ReflectDefault=20] attribute unsigned long cols;
   [CEReactions, Reflect] attribute DOMString dirName;
   [CEReactions, Reflect] attribute boolean disabled;
   readonly attribute HTMLFormElement? form;
   [CEReactions, Reflect] attribute DOMString inputMode;
-  [CEReactions, Reflect] attribute long maxLength; // TODO limited to only non-negative numbers
-  [CEReactions, Reflect] attribute long minLength; // TODO limited to only non-negative numbers
+  [CEReactions, ReflectNonNegative] attribute long maxLength;
+  [CEReactions, ReflectNonNegative] attribute long minLength;
   [CEReactions, Reflect] attribute DOMString name;
   [CEReactions, Reflect] attribute DOMString placeholder;
   [CEReactions, Reflect] attribute boolean readOnly;
   [CEReactions, Reflect] attribute boolean required;
-  [CEReactions] attribute unsigned long rows;
+  [CEReactions, ReflectPositiveWithFallback, ReflectDefault=2] attribute unsigned long rows;
   [CEReactions, Reflect] attribute DOMString wrap;
 
   readonly attribute DOMString type;
