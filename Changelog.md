@@ -26,6 +26,23 @@ Other guidelines:
 * Roughly order changes within those groupings by impact.
 -->
 
+## 25.0.0
+
+This major release changes the prototype of a jsdom's `EventTarget.prototype` to point to the `Object.prototype` inside the jsdom, instead of pointing to the Node.js `Object.prototype`. Thus, the prototype chain of `Window` stays entirely within the jsdom, never crossing over into the Node.js realm.
+
+This only occurs when `runScripts` is set to non-default values of `"dangerously"` or `"outside-only"`, as with the default value, there is no separate `Object.prototype` inside the jsdom.
+
+This will likely not impact many programs, but could cause some changes in `instanceof` behavior, and so out of an abundance of caution, we're releasing it as a new major version.
+
+## 24.1.3
+
+* Fixed calls to `postMessage()` that were done as a bare property (i.e., `postMessage()` instead of `window.postMessage()`).
+
+## 24.1.2
+
+* Fixed an issue with the `in` operator applied to `EventTarget` methods, e.g. `'addEventListener' in window`, which only appeared in Node.js ≥22.5.0. (legendecas)
+* Fixed the events fired by `blur()`: it no longer fires `focus` and `focusin` on the `Document`, and `blur` and `focusout` no longer have their `relatedTarget` property set. (asamuzaK)
+
 ## 24.1.1
 
 * Fixed selection methods to trigger the `selectionchange` event on the `Document` object. (piotr-oles)
