@@ -1,6 +1,6 @@
 {
   "name": "jsdom",
-  "version": "27.0.0",
+  "version": "27.0.1",
   "description": "A JavaScript implementation of many web standards",
   "keywords": [
     "dom",
@@ -23,7 +23,7 @@
     "url": "git+https://github.com/jsdom/jsdom.git"
   },
   "dependencies": {
-    "@asamuzakjp/dom-selector": "^6.6.2",
+    "@asamuzakjp/dom-selector": "^6.7.2",
     "cssstyle": "^5.3.1",
     "data-urls": "^6.0.0",
     "decimal.js": "^10.6.0",
