@@ -1,6 +1,6 @@
 {
   "name": "jsdom",
-  "version": "28.0.0",
+  "version": "28.1.0",
   "description": "A JavaScript implementation of many web standards",
   "keywords": [
     "dom",
@@ -24,7 +24,8 @@
   },
   "dependencies": {
     "@acemir/cssom": "^0.9.31",
-    "@asamuzakjp/dom-selector": "^6.7.8",
+    "@asamuzakjp/dom-selector": "^6.8.1",
+    "@bramus/specificity": "^2.4.2",
     "@exodus/bytes": "^1.11.0",
     "cssstyle": "^6.0.1",
     "data-urls": "^7.0.0",
@@ -65,13 +66,16 @@
     "npm-run-all2": "^8.0.4",
     "opener": "^1.5.2",
     "pngjs": "^7.0.0",
+    "semver": "^7.7.4",
     "server-destroy": "^1.0.1",
     "tinybench": "^6.0.0",
+    "webidl2": "^24.5.0",
     "webidl2js": "^19.1.0"
   },
   "scripts": {
     "prepare": "npm-run-all prepare:*",
     "prepare:convert-idl": "node ./scripts/webidl/convert.js",
+    "prepare:generate-event-sets": "node ./scripts/generate-event-sets.js",
     "prepare:generate-js-globals": "node ./scripts/generate-js-globals.js",
     "pretest": "npm run prepare && npm run wpt:init",
     "test": "npm-run-all --continue-on-error test:*",
