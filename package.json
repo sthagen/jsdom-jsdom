@@ -1,6 +1,6 @@
 {
   "name": "jsdom",
-  "version": "28.1.0",
+  "version": "29.0.0",
   "description": "A JavaScript implementation of many web standards",
   "keywords": [
     "dom",
@@ -26,19 +26,19 @@
     "@asamuzakjp/css-color": "^5.0.1",
     "@asamuzakjp/dom-selector": "^7.0.2",
     "@bramus/specificity": "^2.4.2",
-    "@csstools/css-syntax-patches-for-csstree": "^1.0.28",
+    "@csstools/css-syntax-patches-for-csstree": "^1.1.1",
     "@exodus/bytes": "^1.15.0",
     "css-tree": "^3.2.1",
     "data-urls": "^7.0.0",
     "decimal.js": "^10.6.0",
     "html-encoding-sniffer": "^6.0.0",
     "is-potential-custom-element-name": "^1.0.1",
-    "lru-cache": "^11.2.6",
+    "lru-cache": "^11.2.7",
     "parse5": "^8.0.0",
     "saxes": "^6.0.0",
     "symbol-tree": "^3.2.4",
-    "tough-cookie": "^6.0.0",
-    "undici": "^7.22.0",
+    "tough-cookie": "^6.0.1",
+    "undici": "^7.24.3",
     "w3c-xmlserializer": "^5.0.0",
     "webidl-conversions": "^8.0.1",
     "whatwg-mimetype": "^5.0.0",
@@ -72,14 +72,15 @@
     "server-destroy": "^1.0.1",
     "tinybench": "^6.0.0",
     "webidl2": "^24.5.0",
-    "webidl2js": "^19.1.0"
+    "webidl2js": "^19.1.0",
+    "wireit": "^0.14.12"
   },
   "scripts": {
-    "prepare": "npm-run-all prepare:*",
-    "prepare:convert-idl": "node ./scripts/webidl/convert.js",
-    "prepare:generate-event-sets": "node ./scripts/generate-event-sets.js",
-    "prepare:generate-css-style-properties": "node ./scripts/generate-css-style-properties.js",
-    "prepare:generate-js-globals": "node ./scripts/generate-js-globals.js",
+    "prepare": "wireit",
+    "prepare:convert-idl": "wireit",
+    "prepare:generate-event-sets": "wireit",
+    "prepare:generate-css-style-properties": "wireit",
+    "prepare:generate-js-globals": "wireit",
     "pretest": "npm run prepare && npm run wpt:init",
     "test": "npm-run-all --continue-on-error test:*",
     "test:api": "mocha test/api/",
@@ -91,8 +92,31 @@
     "wpt:init": "git submodule update --init --recursive",
     "wpt:reset": "rm -rf ./test/web-platform-tests/tests && npm run wpt:init",
     "wpt:update": "git submodule update --init --recursive --remote && cd test/web-platform-tests/tests && python wpt.py manifest --path ../wpt-manifest.json",
-    "update-authors": "git log --format=\"%aN <%aE>\" | sort -f | uniq > AUTHORS.txt",
     "benchmark": "node ./benchmark/runner"
+  },
+  "wireit": {
+    "prepare": {
+      "dependencies": [
+        "prepare:convert-idl",
+        "prepare:generate-event-sets",
+        "prepare:generate-js-globals"
+      ]
+    },
+    "prepare:convert-idl": {
+      "command": "node ./scripts/webidl/convert.js",
+      "dependencies": [
+        "prepare:generate-css-style-properties"
+      ]
+    },
+    "prepare:generate-event-sets": {
+      "command": "node ./scripts/generate-event-sets.js"
+    },
+    "prepare:generate-css-style-properties": {
+      "command": "node ./scripts/generate-css-style-properties.js"
+    },
+    "prepare:generate-js-globals": {
+      "command": "node ./scripts/generate-js-globals.js"
+    }
   },
   "main": "./lib/api.js",
   "type": "commonjs",
