@@ -23,6 +23,10 @@ function unexpectedPassingTestMessage(expectationsFilename) {
 
 module.exports = (urlPrefixFactory, expectationsFilenameForErrorMessage) => {
   return (testPath, title = testPath, expectFail = false) => {
+    // Skip tentative tests
+    if (/tentative[./]/.test(testPath)) {
+      return;
+    }
     specify({
       title,
       expectPromise: true,
@@ -30,7 +34,7 @@ module.exports = (urlPrefixFactory, expectationsFilenameForErrorMessage) => {
       timeout: 120_000,
       slow: 10_000,
       fn() {
-        return createJSDOM(urlPrefixFactory(), testPath, expectFail, expectationsFilenameForErrorMessage);
+        return createJSDOM(urlPrefixFactory(testPath), testPath, expectFail, expectationsFilenameForErrorMessage);
       }
     });
   };
