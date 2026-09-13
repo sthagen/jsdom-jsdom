@@ -10,20 +10,23 @@
 <script>
 "use strict";
 
-test(() => {
+test(t => {
 
   let form = document.createElement("form");
   form.id = "form1";
   document.body.appendChild(form);
   form = document.getElementById("form1");
+  t.add_cleanup(() => form.remove());
 
   const redherring = document.createElement("div");
   redherring.id = "form2";
+  t.add_cleanup(() => redherring.remove());
   document.body.appendChild(redherring);
 
   const elementNames = ["button", "input", "select", "textarea", "fieldset", "object", "output"];
   elementNames.forEach(e => {
     const el = document.createElement(e);
+    t.add_cleanup(() => el.remove());
     document.body.appendChild(el);
     assert_equals(el.form, null, `${e} without form attribute`);
     el.setAttribute("form", "form1");
@@ -33,12 +36,45 @@ test(() => {
   });
 }, "`form` property of elements connected via 'form' attribute is correct");
 
+test(t => {
+  const form = document.createElement("form");
+  const input = document.createElement("input");
+  t.add_cleanup(() => {
+    form.remove();
+    input.remove();
+  });
+  input.setAttribute("form", "namespaced-id");
+  document.body.append(form, input);
+
+  form.setAttributeNS("https://example.com/", "id", "namespaced-id");
+  assert_equals(input.form, null, "a namespaced ID does not associate the control");
+}, "The form attribute only matches null-namespace ID attributes");
+
+test(t => {
+  const host = document.createElement("div");
+  t.add_cleanup(() => host.remove());
+  document.body.append(host);
+
+  const root = host.attachShadow({ mode: "open" });
+  const form = document.createElement("form");
+  form.id = "shadow-form";
+  const input = document.createElement("input");
+  input.setAttribute("form", form.id);
+  root.append(form, input);
+
+  assert_equals(input.form, form);
+}, "The form attribute associates controls within a shadow root");
+
 
 async_test(t => {
 
   const form = document.createElement("form");
   form.id = "form1";
   const button = document.createElement("button");
+  t.add_cleanup(() => {
+    form.remove();
+    button.remove();
+  });
   button.setAttribute("form", "form1");
 
   document.body.appendChild(form);
@@ -49,7 +85,7 @@ async_test(t => {
   }));
 
   button.click();
-  t.step_timeout(() => t.done(), 500);
+
 
 }, "clicking a button with .click() should trigger a submit (form connected via 'form' attribute)");
 
