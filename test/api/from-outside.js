@@ -107,6 +107,14 @@ describe("Test cases only possible to test from the outside", () => {
     assert.equal(stdout.trim(), "collected");
   });
 
+  it("releases idle MutationObserver bookkeeping", { timeout: 5000 }, () => {
+    const fixturePath = path.resolve(__dirname, "./fixtures/mutation-observer-bookkeeping-with-gc.js");
+    const { status, stderr, stdout } = spawnSync("node", ["--expose-gc", fixturePath], { encoding: "utf-8" });
+
+    assert.equal(status, 0, stderr);
+    assert.equal(stdout.trim(), "collected");
+  });
+
   it("does not retain targets or callbacks of removed signal-bound event listeners", { timeout: 5000 }, () => {
     const fixturePath = path.resolve(__dirname, "./fixtures/event-listener-signal-with-gc.js");
     const { status, stderr, stdout } = spawnSync("node", ["--expose-gc", fixturePath], { encoding: "utf-8" });
@@ -122,6 +130,18 @@ describe("Test cases only possible to test from the outside", () => {
     assert.equal(status, 0, stderr);
     assert.equal(stdout.trim(), "collected");
   });
+
+  for (const scenario of ["valid", "invalid", "throwing", "imported"]) {
+    it(`does not retain closed windows after stylesheet parsing (${scenario})`, { timeout: 5000 }, () => {
+      const fixturePath = path.resolve(__dirname, "./fixtures/stylesheet-parsing-with-gc.mjs");
+      const { status, stderr, stdout } = spawnSync(process.execPath, ["--expose-gc", fixturePath, scenario], {
+        encoding: "utf-8"
+      });
+
+      assert.equal(status, 0, stderr);
+      assert.equal(stdout.trim(), "collected");
+    });
+  }
 
   it("does not dispatch storage events to removed iframe windows", async () => {
     const dom = new JSDOM("", { url: "https://example.com/" });

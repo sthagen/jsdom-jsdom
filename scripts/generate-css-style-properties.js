@@ -48,9 +48,15 @@ async function main() {
   await Promise.all([generateDescriptors(), generateWebIDL()]);
 
   function generateDefinitions() {
+    // Emit only fields consumed at runtime; update this list when runtime consumers
+    // need additional fields. Build-time generation uses the full definitions.
+    const runtimeDefinitions = Array.from(definitions, ([property, definition]) => {
+      const { inherited, initial, longhands, logicalPropertyGroup } = definition;
+      return [property, { inherited, initial, longhands, logicalPropertyGroup }];
+    });
     const output = `"use strict";
 
-module.exports = new Map(${JSON.stringify([...definitions], undefined, 2)});
+module.exports = new Map(${JSON.stringify(runtimeDefinitions, undefined, 2)});
 `;
     return fs.writeFile(path.resolve(outputDir, "css-property-definitions.js"), output);
   }
@@ -121,8 +127,24 @@ module.exports = new Map([
   ${resolvedValueResolvers.join(",\n  ")}
 ]);
 `;
+    // Share identical metadata to reduce generated code and allocations.
+    const uniqueMetadata = new Map();
+    const metadataEntries = metadata.map(([property, opts]) => {
+      const source = JSON.stringify(opts);
+      if (!uniqueMetadata.has(source)) {
+        uniqueMetadata.set(source, `metadata${uniqueMetadata.size}`);
+      }
+      return `["${property}", ${uniqueMetadata.get(source)}]`;
+    });
     const metadataOutput = `"use strict";
-module.exports = new Map(${JSON.stringify(metadata, undefined, 2)});
+
+// Metadata objects, including nested values, are shared across properties.
+// Treat them as immutable.
+${Array.from(uniqueMetadata, ([source, identifier]) => `const ${identifier} = ${source};`).join("\n")}
+
+module.exports = new Map([
+  ${metadataEntries.join(",\n  ")}
+]);
 `;
     return Promise.all([
       fs.writeFile(
